@@ -12,7 +12,7 @@ jobs:
   build-mxe:
     uses: ./.github/workflows/build-mxe.yml
     with:
-      MXE_VERSION: build-2020-06-06
+      MXE_VERSION: build-2019-06-02
       GCC_VERSION: 9
 
   build-oxce:
@@ -21,7 +21,7 @@ jobs:
       - build-mxe
 
     env:
-      MXE_VERSION: build-2020-06-06
+      MXE_VERSION: build-2019-06-02
       GCC_VERSION: 9
 
     steps:
