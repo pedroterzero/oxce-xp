@@ -21,8 +21,8 @@ jobs:
         with:
           path: /opt/mxe
           key: ${{ runner.os }}-mxe-v${{ inputs.MXE_VERSION }}-gcc${{ inputs.GCC_VERSION }}
-          restore-keys: |
-            ${{ runner.os }}-mxe-
+          # restore-keys: |
+          #   ${{ runner.os }}-mxe-
 
       - name: Install MXE dependencies
         run: |

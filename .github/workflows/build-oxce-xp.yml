@@ -34,10 +34,10 @@ jobs:
       - build-mxe
 
     steps:
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y git cmake build-essential libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-gfx1.2-dev zlib1g-dev
+      # - name: Install dependencies
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y git cmake build-essential libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-gfx1.2-dev zlib1g-dev
 
       - name: Cache MXE
         id: cache-mxe
@@ -58,10 +58,9 @@ jobs:
         run: |
           git clone https://github.com/MeridianOXC/OpenXcom.git oxce
           cd oxce
-          mkdir -p deps/include
           # ln -s /opt/mxe/usr/i686-w64-mingw32.static/include/SDL deps/include
           # ln -s /opt/mxe/usr/i686-w64-mingw32.static/include/yaml-cpp deps/include
-          ln -s /opt/mxe/usr/i686-w64-mingw32.static/include deps/include
+          ln -s /opt/mxe/usr/i686-w64-mingw32.static/include deps
           mkdir build
           cd build
           export PATH=/opt/mxe/usr/bin:$PATH
