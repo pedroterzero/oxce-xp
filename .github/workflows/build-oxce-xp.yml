@@ -13,13 +13,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # - name: Checkout code
-      #   uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Build yaml-cpp
-        uses: ./.github/workflows/build-yaml-cpp.yml
-        with:
-          YAML_CPP_VERSION: 0.6.3
+  build-yaml-cpp:
+    uses: ./.github/workflows/build-yaml-cpp.yml # This is how you call a reusable workflow
+    with:
+      YAML_CPP_VERSION: 0.6.3
 
       # Other steps for building OXCE-XP
       # - name: Start tmate session
