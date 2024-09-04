@@ -20,8 +20,8 @@ jobs:
       #   run: sudo apt-get update && sudo apt-get install -y git zip
       - name: Install dependencies
         run: |
-          apt-get update
-          apt-get install -y git cmake build-essential libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-gfx1.2-dev zlib1g-dev
+          sudo apt-get update
+          sudo apt-get install -y git cmake build-essential libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-gfx1.2-dev zlib1g-dev
 
       - name: Cache yaml-cpp
         id: cache-yaml-cpp
