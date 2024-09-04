@@ -32,7 +32,9 @@ jobs:
       - name: Set up MXE environment (Windows XP support)
         if: steps.cache-mxe.outputs.cache-hit != 'true'
         run: |
-          git clone https://github.com/mxe/mxe.git /opt/mxe
+          if [ -d /opt/mxe ]; then
+            git clone https://github.com/mxe/mxe.git /opt/mxe
+          fi
           cd /opt/mxe
           git checkout ${{ inputs.MXE_VERSION }}
           make MXE_TARGETS=i686-w64-mingw32.static JOBS=$(nproc) gcc${{ inputs.GCC_VERSION }} cmake sdl sdl_gfx sdl_mixer sdl_image yaml-cpp
