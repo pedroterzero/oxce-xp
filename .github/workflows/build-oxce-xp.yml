@@ -19,10 +19,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build yaml-cpp
-        uses: ./.github/workflows/build-yaml-cpp.yml@main # Specify branch here
-        with:
-          YAML_CPP_VERSION: ${{ env.YAML_CPP_VERSION }}
+  build-yaml-cpp:
+    uses: ./.github/workflows/build-yaml-cpp.yml # This is how you call a reusable workflow
+    with:
+      YAML_CPP_VERSION: ${{ env.YAML_CPP_VERSION }}
 
       # Other steps for building OXCE-XP
       # - name: Start tmate session
