@@ -62,9 +62,7 @@ jobs:
         run: |
           git clone https://github.com/MeridianOXC/OpenXcom.git oxce
           cd oxce
-          # ln -s /opt/mxe/usr/i686-w64-mingw32.static/include/SDL deps/include
-          # ln -s /opt/mxe/usr/i686-w64-mingw32.static/include/yaml-cpp deps/include
-          ln -s /opt/mxe/usr/i686-w64-mingw32.static/include deps
+          rm -rf deps
           mkdir build
           cd build
           export PATH=/opt/mxe/usr/bin:$PATH
