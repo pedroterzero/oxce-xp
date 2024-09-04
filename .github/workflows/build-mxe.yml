@@ -41,3 +41,15 @@ jobs:
         with:
           path: /opt/mxe
           key: ${{ runner.os }}-mxe-v${{ inputs.MXE_VERSION }}
+
+      # - name: Save MXE binaries artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: mxe-binaries
+      #     path: /opt/mxe/usr
+
+      - name: Save MXE artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mxe
+          path: /opt/mxe

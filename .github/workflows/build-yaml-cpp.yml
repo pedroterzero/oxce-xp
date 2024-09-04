@@ -58,3 +58,9 @@ jobs:
         with:
           path: yaml-cpp
           key: ${{ runner.os }}-yaml-cpp-v${{ inputs.YAML_CPP_VERSION }}
+
+      - name: Save yaml-cpp artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: yaml-cpp
+          path: yaml-cpp
