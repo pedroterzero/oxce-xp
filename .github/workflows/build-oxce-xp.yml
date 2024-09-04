@@ -64,6 +64,13 @@ jobs:
           path: yaml-cpp/yaml-build
           key: ${{ runner.os }}-yaml-cpp-build-v${{ env.YAML_CPP_VERSION }}
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 30
+
+      # - name: Start tmate session
+      #   run: tmate -F
+
       # - name: Cache MXE
       #   id: cache-mxe
       #   uses: actions/cache@v2
