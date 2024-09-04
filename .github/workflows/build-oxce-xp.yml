@@ -12,43 +12,55 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    steps:
-      # - name: Checkout code
-      #   uses: actions/checkout@v2
+    env:
+      YAML_CPP_VERSION: 0.6.3
 
-      # - name: Install dependencies
-      #   run: sudo apt-get update && sudo apt-get install -y git zip
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
       - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y git cmake build-essential libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-gfx1.2-dev zlib1g-dev
 
-      - name: Cache yaml-cpp
-        id: cache-yaml-cpp
+      - name: Cache yaml-cpp build
+        id: cache-yaml-cpp-build
         uses: actions/cache@v2
         with:
-          path: /usr/local/lib/libyaml-cpp.a
-          key: ${{ runner.os }}-yaml-cpp-${{ hashFiles('**/yaml-cpp/**') }}
+          path: yaml-cpp/yaml-build
+          key: ${{ runner.os }}-yaml-cpp-build-v${{ env.YAML_CPP_VERSION }}
           restore-keys: |
-            ${{ runner.os }}-yaml-cpp-
+            ${{ runner.os }}-yaml-cpp-build-
 
-      - name: Install yaml-cpp
-        if: steps.cache-yaml-cpp.outputs.cache-hit != 'true'
+      - name: Clone yaml-cpp repository
         run: |
           git clone https://github.com/jbeder/yaml-cpp
           cd yaml-cpp
-          git checkout yaml-cpp-0.6.3
-          mkdir yaml-build
+          git checkout yaml-cpp-${{ env.YAML_CPP_VERSION }}
+
+      - name: Configure yaml-cpp
+        run: |
+          cd yaml-cpp
+          mkdir -p yaml-build
           cd yaml-build
           cmake .. -DCMAKE_BUILD_TYPE=Release -DYAML_CPP_BUILD_CONTRIB=OFF -DYAML_CPP_BUILD_TESTS=OFF -DYAML_CPP_BUILD_TOOLS=OFF
+
+      - name: Build yaml-cpp
+        run: |
+          cd yaml-cpp/yaml-build
+          make
+
+      - name: Install yaml-cpp
+        run: |
+          cd yaml-cpp/yaml-build
           sudo make install
 
-      - name: Save yaml-cpp cache
-        if: steps.cache-yaml-cpp.outputs.cache-hit != 'true'
+      - name: Save yaml-cpp build cache
         uses: actions/cache@v2
         with:
-          path: /usr/local/lib/libyaml-cpp.a
-          key: ${{ runner.os }}-yaml-cpp-${{ hashFiles('**/yaml-cpp/**') }}
+          path: yaml-cpp/yaml-build
+          key: ${{ runner.os }}-yaml-cpp-build-v${{ env.YAML_CPP_VERSION }}
 
       # - name: Cache MXE
       #   id: cache-mxe
