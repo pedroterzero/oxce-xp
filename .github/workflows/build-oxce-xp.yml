@@ -16,10 +16,10 @@ jobs:
   #     - name: Checkout code
   #       uses: actions/checkout@v4
 
-  # build-yaml-cpp:
-  #   uses: ./.github/workflows/build-yaml-cpp.yml # This is how you call a reusable workflow
-  #   with:
-  #     YAML_CPP_VERSION: 0.6.3
+  build-yaml-cpp:
+    uses: ./.github/workflows/build-yaml-cpp.yml
+    with:
+      YAML_CPP_VERSION: 0.6.3
 
   build-mxe:
     runs-on: ubuntu-22.04
@@ -30,7 +30,7 @@ jobs:
     steps:
       - name: Cache MXE
         id: cache-mxe
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: /opt/mxe
           # key: ${{ runner.os }}-mxe-${{ hashFiles('**/mxe/**') }}
@@ -47,12 +47,9 @@ jobs:
           # git checkout 87a9b83dcf7d1650149e1d24f490d70405ddba1f  # Commit supporting XP
           make MXE_TARGETS=i686-w64-mingw32.static JOBS=$(nproc) gcc cmake sdl sdl_gfx sdl_mixer sdl_image yaml-cpp
 
-      - name: Cache MXE
-        id: cache-mxe
+      - name: Save MXE cache
+        if: steps.cache-mxe.outputs.cache-hit != 'true'
         uses: actions/cache@v4
         with:
           path: /opt/mxe
-          # key: ${{ runner.os }}-mxe-${{ hashFiles('**/mxe/**') }}
           key: ${{ runner.os }}-mxe-v${{ env.MXE_VERSION }}
-          restore-keys: |
-            ${{ runner.os }}-mxe-
