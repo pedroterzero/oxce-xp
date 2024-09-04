@@ -48,8 +48,8 @@ jobs:
       #     name: mxe-binaries
       #     path: /opt/mxe/usr
 
-      - name: Save MXE artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: mxe
-          path: /opt/mxe
+      # - name: Save MXE artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: mxe
+      #     path: /opt/mxe

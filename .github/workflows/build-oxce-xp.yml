@@ -39,11 +39,26 @@ jobs:
       #     name: mxe-binaries
       #     path: /opt/mxe/usr
 
-      - name: Download MXE artifact
-        uses: actions/download-artifact@v4
+      # - name: Download MXE artifact
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: mxe
+      #     path: /opt/mxe
+
+      - name: Cache MXE
+        id: cache-mxe
+        uses: actions/cache@v4
         with:
-          name: mxe
           path: /opt/mxe
+          key: ${{ runner.os }}-mxe-vbuild-2022-01-13
+          restore-keys: |
+            ${{ runner.os }}-mxe-
+
+      - name: Check if cache was restored
+        if: steps.cache-mxe.outputs.cache-hit != 'true'
+        run: |
+          echo "Cache not found. Failing the job."
+          exit 1
 
       - name: Build
         run: |
@@ -52,7 +67,7 @@ jobs:
           mkdir build
           cd build
           export PATH=/opt/mxe/usr/bin:$PATH
-          /opt/mxe/usr/bin/x86_64-w64-mingw32.static-cmake -DCMAKE_BUILD_TYPE=Release -DDEV_BUILD=OFF -DBUILD_PACKAGE=OFF ..
+          /opt/mxe/usr/bin/i686-w64-mingw32.static-cmake-DCMAKE_BUILD_TYPE=Release -DDEV_BUILD=OFF -DBUILD_PACKAGE=OFF ..
           make -j$(nproc)
 
       - name: Setup tmate session
