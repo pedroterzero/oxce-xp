@@ -37,7 +37,8 @@ jobs:
           fi
           cd /opt/mxe
           git checkout ${{ inputs.MXE_VERSION }}
-          make MXE_TARGETS=i686-w64-mingw32.static JOBS=$(nproc) gcc${{ inputs.GCC_VERSION }} cmake sdl sdl_gfx sdl_mixer sdl_image yaml-cpp
+          export MXE_PLUGIN_DIRS="$PWD/plugins/gcc7"
+          make MXE_TARGETS=i686-w64-mingw32.static JOBS=$(nproc) gcc cmake sdl sdl_gfx sdl_mixer sdl_image yaml-cpp
 
       - name: Save MXE cache
         if: steps.cache-mxe.outputs.cache-hit != 'true'
