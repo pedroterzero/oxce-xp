@@ -21,44 +21,25 @@ jobs:
   #   with:
   #     YAML_CPP_VERSION: 0.6.3
 
-  build-mxe:
-    uses: ./.github/workflows/build-mxe.yml
-    with:
-      MXE_VERSION: build-2022-01-13
-
   # build-mxe:
-  #   runs-on: ubuntu-22.04
-
-  #   env:
+  #   uses: ./.github/workflows/build-mxe.yml
+  #   with:
   #     MXE_VERSION: build-2022-01-13
 
-  #   steps:
-  #     - name: Cache MXE
-  #       id: cache-mxe
-  #       uses: actions/cache@v4
-  #       with:
-  #         path: /opt/mxe
-  #         # key: ${{ runner.os }}-mxe-${{ hashFiles('**/mxe/**') }}
-  #         key: ${{ runner.os }}-mxe-v${{ env.MXE_VERSION }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-mxe-
+  build-oxce:
+    runs-on: ubuntu-22.04
 
-  #     - name: Install MXE dependencies
-  #       run: |
-  #         sudo apt-get update
-  #         sudo apt-get install -y autopoint gperf intltool libtool-bin lzip
-
-  #     - name: Set up MXE environment (Windows XP support)
-  #       if: steps.cache-mxe.outputs.cache-hit != 'true'
-  #       run: |
-  #         git clone https://github.com/mxe/mxe.git /opt/mxe
-  #         cd /opt/mxe
-  #         git checkout ${{ env.MXE_VERSION }}
-  #         make MXE_TARGETS=i686-w64-mingw32.static JOBS=$(nproc) gcc cmake sdl sdl_gfx sdl_mixer sdl_image yaml-cpp
-
-  #     - name: Save MXE cache
-  #       if: steps.cache-mxe.outputs.cache-hit != 'true'
-  #       uses: actions/cache@v4
-  #       with:
-  #         path: /opt/mxe
-  #         key: ${{ runner.os }}-mxe-v${{ env.MXE_VERSION }}
+    steps:
+      - name: Build
+        run: |
+          git clone https://github.com/MeridianOXC/OpenXcom.git oxce
+          cd oxce
+          mkdir build
+          cd build
+          export PATH=/opt/mxe/usr/bin:$PATH
+          /opt/mxe/usr/bin/x86_64-w64-mingw32.static-cmake -DCMAKE_BUILD_TYPE=Release -DDEV_BUILD=OFF -DBUILD_PACKAGE=OFF ..
+          make -j$(nproc)
+      - name: Setup tmate session
+        if: always()
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 30
