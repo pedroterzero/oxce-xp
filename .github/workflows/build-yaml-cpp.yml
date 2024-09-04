@@ -1,0 +1,57 @@
+name: Build yaml-cpp
+
+on:
+  workflow_call:
+    inputs:
+      YAML_CPP_VERSION:
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git cmake build-essential libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-gfx1.2-dev zlib1g-dev
+
+      - name: Cache yaml-cpp build
+        id: cache-yaml-cpp-build
+        uses: actions/cache@v4
+        with:
+          path: yaml-cpp/yaml-build
+          key: ${{ runner.os }}-yaml-cpp-build-v${{ inputs.YAML_CPP_VERSION }}
+          restore-keys: |
+            ${{ runner.os }}-yaml-cpp-build-
+
+      - name: Clone yaml-cpp repository
+        run: |
+          git clone https://github.com/jbeder/yaml-cpp
+          cd yaml-cpp
+          git checkout yaml-cpp-${{ inputs.YAML_CPP_VERSION }}
+
+      - name: Configure yaml-cpp
+        run: |
+          cd yaml-cpp
+          mkdir -p yaml-build
+          cd yaml-build
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DYAML_CPP_BUILD_CONTRIB=OFF -DYAML_CPP_BUILD_TESTS=OFF -DYAML_CPP_BUILD_TOOLS=OFF
+
+      - name: Build yaml-cpp
+        run: |
+          cd yaml-cpp/yaml-build
+          make
+
+      - name: Install yaml-cpp
+        run: |
+          cd yaml-cpp/yaml-build
+          sudo make install
+
+      - name: Save yaml-cpp cache
+        if: steps.cache-yaml-cpp-build.outputs.cache-hit != 'true'
+        uses: actions/cache@v4
+        with:
+          path: yaml-cpp
+          key: ${{ runner.os }}-yaml-cpp-v${{ inputs.YAML_CPP_VERSION }}

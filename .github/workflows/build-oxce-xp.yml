@@ -1,4 +1,4 @@
-name: Cross-compile OXCE for Windows XP
+name: Build OXCE-XP
 
 on:
   push:
@@ -16,52 +16,35 @@ jobs:
       YAML_CPP_VERSION: 0.6.3
 
     steps:
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y git cmake build-essential libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-gfx1.2-dev zlib1g-dev
-
-      - name: Cache yaml-cpp
-        id: cache-yaml-cpp
-        uses: actions/cache@v4
-        with:
-          path: yaml-cpp
-          key: ${{ runner.os }}-yaml-cpp-v${{ env.YAML_CPP_VERSION }}
-          restore-keys: |
-            ${{ runner.os }}-yaml-cpp-
-
-      - name: Clone yaml-cpp repository
-        if: steps.cache-yaml-cpp.outputs.cache-hit != 'true'
-        run: |
-          git clone https://github.com/jbeder/yaml-cpp
-          cd yaml-cpp
-          git checkout yaml-cpp-${{ env.YAML_CPP_VERSION }}
-
-      - name: Configure yaml-cpp
-        if: steps.cache-yaml-cpp.outputs.cache-hit != 'true'
-        run: |
-          cd yaml-cpp
-          mkdir -p yaml-build
-          cd yaml-build
-          cmake .. -DCMAKE_BUILD_TYPE=Release -DYAML_CPP_BUILD_CONTRIB=OFF -DYAML_CPP_BUILD_TESTS=OFF -DYAML_CPP_BUILD_TOOLS=OFF
+      # - name: Checkout code
+      #   uses: actions/checkout@v4
 
       - name: Build yaml-cpp
-        if: steps.cache-yaml-cpp.outputs.cache-hit != 'true'
-        run: |
-          cd yaml-cpp/yaml-build
-          make
-
-      - name: Install yaml-cpp
-        run: |
-          cd yaml-cpp/yaml-build
-          sudo make install
-
-      - name: Save yaml-cpp cache
-        if: steps.cache-yaml-cpp.outputs.cache-hit != 'true'
-        uses: actions/cache@v4
+        uses: ./.github/workflows/build-yaml-cpp.yml
         with:
-          path: yaml-cpp
-          key: ${{ runner.os }}-yaml-cpp-v${{ env.YAML_CPP_VERSION }}
+          YAML_CPP_VERSION: ${{ env.YAML_CPP_VERSION }}
+
+      # Other steps for building OXCE-XP
+      # - name: Start tmate session
+      #   run: tmate -F
+
+      # - name: Cache MXE
+      #   id: cache-mxe
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: /opt/mxe
+      #     key: ${{ runner.os }}-mxe-${{ hashFiles('**/mxe/**') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-mxe-
+
+      # - name: Set up MXE environment (Windows XP support)
+      #   if: steps.cache-mxe.outputs.cache-hit != 'true'
+      #   run: |
+      #     git clone https://github.com/mxe/mxe.git /opt/mxe
+      #     cd /opt/mxe
+      #     git checkout 1efbfb68
+      #     # git checkout 87a9b83dcf7d1650149e1d24f490d70405ddba1f  # Commit supporting XP
+      #     make MXE_TARGETS=i686-w64-mingw32.static JOBS=8 gcc cmake sdl sdl_gfx sdl_mixer sdl_image yaml-cpp
 
       # - name: Start tmate session
       #   run: tmate -F
