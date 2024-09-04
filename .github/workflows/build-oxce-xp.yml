@@ -67,7 +67,7 @@ jobs:
           mkdir build
           cd build
           export PATH=/opt/mxe/usr/bin:$PATH
-          /opt/mxe/usr/bin/i686-w64-mingw32.static-cmake-DCMAKE_BUILD_TYPE=Release -DDEV_BUILD=OFF -DBUILD_PACKAGE=OFF ..
+          /opt/mxe/usr/bin/i686-w64-mingw32.static-cmake -DCMAKE_BUILD_TYPE=Release -DDEV_BUILD=OFF -DBUILD_PACKAGE=OFF ..
           make -j$(nproc)
 
       - name: Setup tmate session
