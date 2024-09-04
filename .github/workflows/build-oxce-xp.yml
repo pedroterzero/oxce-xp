@@ -8,10 +8,6 @@ on:
     branches:
       - main
 
-env:
-  MXE_VERSION: build-2022-01-13
-  GCC_VERSION: 9
-
 jobs:
   # build:
   #   runs-on: ubuntu-latest
@@ -28,14 +24,18 @@ jobs:
   build-mxe:
     uses: ./.github/workflows/build-mxe.yml
     with:
-      MXE_VERSION: ${{ env.MXE_VERSION }}
-      GCC_VERSION: ${{ env.GCC_VERSION }}
+      MXE_VERSION: build-2022-01-13
+      GCC_VERSION: 9
 
   build-oxce:
     runs-on: ubuntu-22.04
     needs:
       # - build-yaml-cpp
       - build-mxe
+
+    env:
+      MXE_VERSION: build-2022-01-13
+      GCC_VERSION: 9
 
     steps:
       # - name: Install dependencies
@@ -49,8 +49,8 @@ jobs:
         with:
           path: /opt/mxe
           key: ${{ runner.os }}-mxe-v${{ env.MXE_VERSION }}-gcc${{ env.GCC_VERSION }}
-          restore-keys: |
-            ${{ runner.os }}-mxe-
+          # restore-keys: |
+          #   ${{ runner.os }}-mxe-
 
       - name: Check if cache was restored
         if: steps.cache-mxe.outputs.cache-hit != 'true'
