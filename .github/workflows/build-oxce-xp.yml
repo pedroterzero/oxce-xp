@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-22.04
 
     env:
-      MXE_VERSION: 1efbfb68
+      MXE_VERSION: build-2022-01-13
 
     steps:
       - name: Cache MXE
