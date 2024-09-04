@@ -16,10 +16,10 @@ jobs:
   #     - name: Checkout code
   #       uses: actions/checkout@v4
 
-  build-yaml-cpp:
-    uses: ./.github/workflows/build-yaml-cpp.yml
-    with:
-      YAML_CPP_VERSION: 0.6.3
+  # build-yaml-cpp:
+  #   uses: ./.github/workflows/build-yaml-cpp.yml
+  #   with:
+  #     YAML_CPP_VERSION: 0.6.3
 
   build-mxe:
     runs-on: ubuntu-22.04
@@ -37,6 +37,11 @@ jobs:
           key: ${{ runner.os }}-mxe-v${{ env.MXE_VERSION }}
           restore-keys: |
             ${{ runner.os }}-mxe-
+
+      - name: Install MXE dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y autopoint gperf intltool libtool-bin lzip
 
       - name: Set up MXE environment (Windows XP support)
         if: steps.cache-mxe.outputs.cache-hit != 'true'
