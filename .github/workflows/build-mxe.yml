@@ -30,6 +30,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y autopoint gperf intltool libtool-bin lzip
 
+      - name: Remove Python 3 and set Python 2 as default
+        run: |
+          sudo apt-get remove -y python3
+          sudo apt-get install -y python2
+          sudo update-alternatives --install /usr/bin/python python /usr/bin/python2 1
+          sudo update-alternatives --set python /usr/bin/python2
+
       - name: Set up MXE environment (Windows XP support)
         if: steps.cache-mxe.outputs.cache-hit != 'true'
         run: |
