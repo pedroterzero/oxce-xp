@@ -34,12 +34,14 @@ jobs:
             ${{ runner.os }}-yaml-cpp-build-
 
       - name: Clone yaml-cpp repository
+        if: steps.cache-yaml-cpp-build.outputs.cache-hit != 'true'
         run: |
           git clone https://github.com/jbeder/yaml-cpp
           cd yaml-cpp
           git checkout yaml-cpp-${{ env.YAML_CPP_VERSION }}
 
       - name: Configure yaml-cpp
+        if: steps.cache-yaml-cpp-build.outputs.cache-hit != 'true'
         run: |
           cd yaml-cpp
           mkdir -p yaml-build
@@ -47,6 +49,7 @@ jobs:
           cmake .. -DCMAKE_BUILD_TYPE=Release -DYAML_CPP_BUILD_CONTRIB=OFF -DYAML_CPP_BUILD_TESTS=OFF -DYAML_CPP_BUILD_TOOLS=OFF
 
       - name: Build yaml-cpp
+        if: steps.cache-yaml-cpp-build.outputs.cache-hit != 'true'
         run: |
           cd yaml-cpp/yaml-build
           make
