@@ -22,7 +22,7 @@ jobs:
   #     YAML_CPP_VERSION: 0.6.3
 
   build-mxe:
-    uses: ./.github/workflows/build-yaml-cpp.yml
+    uses: ./.github/workflows/build-mxe.yml
     with:
       MXE_VERSION: build-2022-01-13
 
