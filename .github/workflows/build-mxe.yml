@@ -25,6 +25,7 @@ jobs:
           #   ${{ runner.os }}-mxe-
 
       - name: Install MXE dependencies
+        if: steps.cache-mxe.outputs.cache-hit != 'true'
         run: |
           sudo apt-get update
           sudo apt-get install -y autopoint gperf intltool libtool-bin lzip

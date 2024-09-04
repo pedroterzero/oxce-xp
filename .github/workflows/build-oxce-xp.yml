@@ -24,8 +24,8 @@ jobs:
   build-mxe:
     uses: ./.github/workflows/build-mxe.yml
     with:
-      MXE_VERSION: build-2022-01-13
-      GCC_VERSION: 7
+      MXE_VERSION: &mxe_version build-2022-01-13
+      GCC_VERSION: &gcc_version 9
 
   build-oxce:
     runs-on: ubuntu-22.04
@@ -44,7 +44,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /opt/mxe
-          key: ${{ runner.os }}-mxe-vbuild-2022-01-13-gcc7
+          key: ${{ runner.os }}-mxe-v*<<mxe_version>>-gcc*<<gcc_version>>
           restore-keys: |
             ${{ runner.os }}-mxe-
 
