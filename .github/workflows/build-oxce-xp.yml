@@ -25,6 +25,7 @@ jobs:
     uses: ./.github/workflows/build-mxe.yml
     with:
       MXE_VERSION: build-2022-01-13
+      GCC_VERSION: 7
 
   build-oxce:
     runs-on: ubuntu-22.04
@@ -33,24 +34,17 @@ jobs:
       - build-mxe
 
     steps:
-      # - name: Download MXE binaries artifact
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: mxe-binaries
-      #     path: /opt/mxe/usr
-
-      # - name: Download MXE artifact
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: mxe
-      #     path: /opt/mxe
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git cmake build-essential libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-gfx1.2-dev zlib1g-dev
 
       - name: Cache MXE
         id: cache-mxe
         uses: actions/cache@v4
         with:
           path: /opt/mxe
-          key: ${{ runner.os }}-mxe-vbuild-2022-01-13
+          key: ${{ runner.os }}-mxe-vbuild-2022-01-13-gcc7
           restore-keys: |
             ${{ runner.os }}-mxe-
 
@@ -64,6 +58,10 @@ jobs:
         run: |
           git clone https://github.com/MeridianOXC/OpenXcom.git oxce
           cd oxce
+          mkdir -p deps/include
+          # ln -s /opt/mxe/usr/i686-w64-mingw32.static/include/SDL deps/include
+          # ln -s /opt/mxe/usr/i686-w64-mingw32.static/include/yaml-cpp deps/include
+          ln -s /opt/mxe/usr/i686-w64-mingw32.static/include deps/include
           mkdir build
           cd build
           export PATH=/opt/mxe/usr/bin:$PATH

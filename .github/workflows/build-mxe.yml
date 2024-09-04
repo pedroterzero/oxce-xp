@@ -6,6 +6,9 @@ on:
       MXE_VERSION:
         required: true
         type: string
+      GCC_VERSION:
+        required: true
+        type: string
 
 jobs:
   build:
@@ -17,8 +20,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /opt/mxe
-          # key: ${{ runner.os }}-mxe-${{ hashFiles('**/mxe/**') }}
-          key: ${{ runner.os }}-mxe-v${{ inputs.MXE_VERSION }}
+          key: ${{ runner.os }}-mxe-v${{ inputs.MXE_VERSION }}-gcc${{ inputs.GCC_VERSION }}
           restore-keys: |
             ${{ runner.os }}-mxe-
 
@@ -33,14 +35,14 @@ jobs:
           git clone https://github.com/mxe/mxe.git /opt/mxe
           cd /opt/mxe
           git checkout ${{ inputs.MXE_VERSION }}
-          make MXE_TARGETS=i686-w64-mingw32.static JOBS=$(nproc) gcc cmake sdl sdl_gfx sdl_mixer sdl_image yaml-cpp
+          make MXE_TARGETS=i686-w64-mingw32.static JOBS=$(nproc) gcc${{ inputs.GCC_VERSION }} cmake sdl sdl_gfx sdl_mixer sdl_image yaml-cpp
 
       - name: Save MXE cache
         if: steps.cache-mxe.outputs.cache-hit != 'true'
         uses: actions/cache@v4
         with:
           path: /opt/mxe
-          key: ${{ runner.os }}-mxe-v${{ inputs.MXE_VERSION }}
+          key: ${{ runner.os }}-mxe-v${{ inputs.MXE_VERSION }}-gcc${{ inputs.GCC_VERSION }}
 
       # - name: Save MXE binaries artifact
       #   uses: actions/upload-artifact@v4
