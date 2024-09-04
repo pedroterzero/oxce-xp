@@ -32,7 +32,7 @@ jobs:
       - name: Set up MXE environment (Windows XP support)
         if: steps.cache-mxe.outputs.cache-hit != 'true'
         run: |
-          if [ -d /opt/mxe ]; then
+          if [ ! -d /opt/mxe ]; then
             git clone https://github.com/mxe/mxe.git /opt/mxe
           fi
           cd /opt/mxe
