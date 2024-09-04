@@ -24,6 +24,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y git cmake build-essential libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-gfx1.2-dev zlib1g-dev
 
+      - name: Clone yaml-cpp repository
+        run: |
+          git clone https://github.com/jbeder/yaml-cpp
+          cd yaml-cpp
+          git checkout yaml-cpp-${{ env.YAML_CPP_VERSION }}
+
       - name: Cache yaml-cpp build
         id: cache-yaml-cpp-build
         uses: actions/cache@v4
@@ -33,15 +39,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yaml-cpp-build-
 
-      - name: Clone yaml-cpp repository
-        if: steps.cache-yaml-cpp-build.outputs.cache-hit != 'true'
-        run: |
-          git clone https://github.com/jbeder/yaml-cpp
-          cd yaml-cpp
-          git checkout yaml-cpp-${{ env.YAML_CPP_VERSION }}
-
       - name: Configure yaml-cpp
-        if: steps.cache-yaml-cpp-build.outputs.cache-hit != 'true'
         run: |
           cd yaml-cpp
           mkdir -p yaml-build
@@ -49,7 +47,6 @@ jobs:
           cmake .. -DCMAKE_BUILD_TYPE=Release -DYAML_CPP_BUILD_CONTRIB=OFF -DYAML_CPP_BUILD_TESTS=OFF -DYAML_CPP_BUILD_TOOLS=OFF
 
       - name: Build yaml-cpp
-        if: steps.cache-yaml-cpp-build.outputs.cache-hit != 'true'
         run: |
           cd yaml-cpp/yaml-build
           make
