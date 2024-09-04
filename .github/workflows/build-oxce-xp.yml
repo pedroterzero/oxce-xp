@@ -40,6 +40,7 @@ jobs:
             ${{ runner.os }}-yaml-cpp-build-
 
       - name: Configure yaml-cpp
+        if: steps.cache-yaml-cpp-build.outputs.cache-hit != 'true'
         run: |
           cd yaml-cpp
           mkdir -p yaml-build
@@ -47,6 +48,7 @@ jobs:
           cmake .. -DCMAKE_BUILD_TYPE=Release -DYAML_CPP_BUILD_CONTRIB=OFF -DYAML_CPP_BUILD_TESTS=OFF -DYAML_CPP_BUILD_TOOLS=OFF
 
       - name: Build yaml-cpp
+        if: steps.cache-yaml-cpp-build.outputs.cache-hit != 'true'
         run: |
           cd yaml-cpp/yaml-build
           make
