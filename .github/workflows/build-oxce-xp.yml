@@ -16,8 +16,8 @@ jobs:
       YAML_CPP_VERSION: 0.6.3
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      # - name: Checkout code
+      #   uses: actions/checkout@v4
 
       - name: Install dependencies
         run: |
@@ -26,7 +26,7 @@ jobs:
 
       - name: Cache yaml-cpp build
         id: cache-yaml-cpp-build
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: yaml-cpp/yaml-build
           key: ${{ runner.os }}-yaml-cpp-build-v${{ env.YAML_CPP_VERSION }}
@@ -57,7 +57,7 @@ jobs:
           sudo make install
 
       - name: Save yaml-cpp build cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: yaml-cpp/yaml-build
           key: ${{ runner.os }}-yaml-cpp-build-v${{ env.YAML_CPP_VERSION }}
