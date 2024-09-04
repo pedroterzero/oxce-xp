@@ -1,0 +1,43 @@
+name: Build mxe
+
+on:
+  workflow_call:
+    inputs:
+      MXE_VERSION:
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Cache MXE
+        id: cache-mxe
+        uses: actions/cache@v4
+        with:
+          path: /opt/mxe
+          # key: ${{ runner.os }}-mxe-${{ hashFiles('**/mxe/**') }}
+          key: ${{ runner.os }}-mxe-v${{ inputs.MXE_VERSION }}
+          restore-keys: |
+            ${{ runner.os }}-mxe-
+
+      - name: Install MXE dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y autopoint gperf intltool libtool-bin lzip
+
+      - name: Set up MXE environment (Windows XP support)
+        if: steps.cache-mxe.outputs.cache-hit != 'true'
+        run: |
+          git clone https://github.com/mxe/mxe.git /opt/mxe
+          cd /opt/mxe
+          git checkout ${{ inputs.MXE_VERSION }}
+          make MXE_TARGETS=i686-w64-mingw32.static JOBS=$(nproc) gcc cmake sdl sdl_gfx sdl_mixer sdl_image yaml-cpp
+
+      - name: Save MXE cache
+        if: steps.cache-mxe.outputs.cache-hit != 'true'
+        uses: actions/cache@v4
+        with:
+          path: /opt/mxe
+          key: ${{ runner.os }}-mxe-v${{ inputs.MXE_VERSION }}
