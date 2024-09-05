@@ -60,7 +60,7 @@ jobs:
           #     ${{ matrix.build-dir || 'build' }}/${{ matrix.app-bundle || 'bin' }}/**/*
           #     !${{ matrix.build-dir || 'build' }}/${{ matrix.app-bundle || 'bin' }}/libopenxcom.dll.a
           path: |
-            oxce/build/bin
+            oxce/build/bin/**/*
             !oxce/build/bin/libopenxcom.dll.a
 
       # - name: Setup tmate session
