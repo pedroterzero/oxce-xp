@@ -31,8 +31,6 @@ jobs:
         with:
           path: /opt/mxe
           key: ${{ runner.os }}-mxe-v${{ env.MXE_VERSION }}-gcc${{ env.GCC_VERSION }}
-          # restore-keys: |
-          #   ${{ runner.os }}-mxe-
 
       - name: Check if cache was restored
         if: steps.cache-mxe.outputs.cache-hit != 'true'
@@ -55,10 +53,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: oxce-winxp
-          # path: oxce/build/bin
-          # path: |
-          #     ${{ matrix.build-dir || 'build' }}/${{ matrix.app-bundle || 'bin' }}/**/*
-          #     !${{ matrix.build-dir || 'build' }}/${{ matrix.app-bundle || 'bin' }}/libopenxcom.dll.a
           path: |
             oxce/build/bin
             !oxce/build/bin/libopenxcom.dll.a
