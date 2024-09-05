@@ -13,7 +13,7 @@ jobs:
     uses: ./.github/workflows/build-mxe.yml
     with:
       MXE_VERSION: build-2020-06-06
-      GCC_VERSION: 9
+      GCC_VERSION: 10
 
   build-oxce:
     runs-on: ubuntu-22.04
@@ -22,7 +22,7 @@ jobs:
 
     env:
       MXE_VERSION: build-2020-06-06
-      GCC_VERSION: 9
+      GCC_VERSION: 10
 
     steps:
       - name: Get MXE from cache (${{ env.MXE_VERSION }}, gcc ${{ env.GCC_VERSION }})
