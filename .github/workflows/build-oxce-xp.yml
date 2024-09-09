@@ -72,10 +72,11 @@ jobs:
         id: determine_tag
         run: |
           if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
-            echo "::set-output name=tag::${{ github.event.client_payload.tag }}"
+            echo "tag=${{ github.event.client_payload.tag }}" >> $GITHUB_ENV
           else
-            echo "::set-output name=tag::${{ github.ref_name }}"
+            echo "tag=${{ github.ref_name }}" >> $GITHUB_ENV
           fi
+          echo "value of tag = $tag"
 
       - name: Create GitHub Release
         id: create_release
@@ -83,8 +84,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.determine_tag.outputs.tag }}
-          release_name: Release ${{ steps.determine_tag.outputs.tag }}
+          tag_name: ${{ env.tag }}
+          release_name: Release ${{ env.tag }}
           draft: false
           prerelease: false
 
