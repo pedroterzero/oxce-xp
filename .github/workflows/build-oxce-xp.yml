@@ -45,6 +45,15 @@ jobs:
           echo "Cache not found. Failing the job."
           exit 1
 
+      - name: Get build cache
+        id: cache-build
+        uses: actions/cache@v4
+        with:
+          path: oxce/build
+          key: ${{ runner.os }}-oxce-build-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-oxce-build-
+
       - name: Build
         run: |
           git clone https://github.com/MeridianOXC/OpenXcom.git oxce
@@ -58,6 +67,13 @@ jobs:
           export PATH=/opt/mxe/usr/bin:$PATH
           /opt/mxe/usr/bin/i686-w64-mingw32.static-cmake -DCMAKE_BUILD_TYPE=Release -DDEV_BUILD=OFF -DBUILD_PACKAGE=OFF ..
           make -j$(nproc)
+
+      - name: Cache build directory
+        if: always()
+        uses: actions/cache@v4
+        with:
+          path: oxce/build
+          key: ${{ runner.os }}-oxce-build-${{ github.sha }}
 
       - name: Zip the artifact
         run: |
