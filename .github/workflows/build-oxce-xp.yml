@@ -8,9 +8,8 @@ name: Build OXCE-XP
 #     branches:
 #       - main
 on:
-  push:
-    tags:
-      - '*'  # Runs when a new tag is created
+  repository_dispatch:
+    types: [build-and-release]
   workflow_dispatch:  # Allows manual triggering
 
 jobs:
@@ -54,6 +53,10 @@ jobs:
           /opt/mxe/usr/bin/i686-w64-mingw32.static-cmake -DCMAKE_BUILD_TYPE=Release -DDEV_BUILD=OFF -DBUILD_PACKAGE=OFF ..
           make -j$(nproc)
 
+      - name: Zip the artifact
+        run: |
+          zip -r oxce-winxp.zip oxce/build/bin
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -62,14 +65,23 @@ jobs:
             oxce/build/bin
             !oxce/build/bin/libopenxcom.dll.a
 
+      - name: Determine tag name
+        id: determine_tag
+        run: |
+          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+            echo "::set-output name=tag::${{ github.event.client_payload.tag }}"
+          else
+            echo "::set-output name=tag::${{ github.ref_name }}"
+          fi
+
       - name: Create GitHub Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ steps.determine_tag.outputs.tag }}
+          release_name: Release ${{ steps.determine_tag.outputs.tag }}
           draft: false
           prerelease: false
 
@@ -79,13 +91,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: oxce/build/bin
-          asset_name: oxce-winxp-${{ github.ref_name }}.zip
+          asset_path: oxce-winxp.zip
+          asset_name: oxce-winxp-${{ steps.determine_tag.outputs.tag }}.zip
           asset_content_type: application/zip
-
-      - name: Zip the artifact
-        run: |
-          zip -r oxce-winxp.zip oxce/build/bin
 
       # - name: Setup tmate session
       #   if: always()
