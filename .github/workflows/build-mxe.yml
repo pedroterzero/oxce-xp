@@ -30,6 +30,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y autopoint gperf intltool libtool-bin lzip
 
+      - name: Install further dependencies for ACT
+        if: ${{ env.ACT }}
+        run: |
+          sudo apt-get install -y p7zip-full bison flex ruby
+
       - name: Remove Python 3 and set Python 2 as default
         if: steps.cache-mxe.outputs.cache-hit != 'true'
         run: |

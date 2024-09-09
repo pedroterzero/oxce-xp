@@ -1,0 +1,89 @@
+name: Check if Build Needed
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Runs daily at midnight UTC
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  check-build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout current repository
+      uses: actions/checkout@v4
+
+    - name: Clone OpenXcom repository
+      run: |
+        git clone --depth 100 https://github.com/MeridianOXC/OpenXcom.git
+        cd OpenXcom
+        git checkout fbcc460
+
+    - name: Extract version from src/version.h
+      id: get_version
+      run: |
+        cd OpenXcom
+        version_short_line=$(grep '#define OPENXCOM_VERSION_SHORT' src/version.h)
+        version_short=$(echo $version_short_line | grep -oP '(?<=").*(?=")' | sed 's/Extended //')
+        version_git_line=$(grep '#define OPENXCOM_VERSION_GIT' src/version.h)
+        version_git=$(echo $version_git_line | grep -oP '(v[^"]*)' | sed 's/v//; s/)//')
+        combined_version="${version_short}-${version_git}"
+        echo "::set-output name=version::$combined_version"
+
+    - name: Get newest tag of current repository
+      id: get_tag
+      run: |
+        latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+        echo "::set-output name=latest_tag::$latest_tag"
+
+    - name: Compare versions
+      id: compare_versions
+      run: |
+        version="${{ steps.get_version.outputs.version }}"
+        latest_tag="${{ steps.get_tag.outputs.latest_tag }}"
+        echo "src/version.h version: $version"
+        echo "Newest tag: $latest_tag"
+
+        # Extract numeric and date parts
+        version_numeric=$(echo $version | cut -d'-' -f1)
+        version_date=$(echo $version | cut -d'-' -f2-)
+        latest_tag_numeric=$(echo $latest_tag | cut -d'-' -f1)
+        latest_tag_date=$(echo $latest_tag | cut -d'-' -f2-)
+
+        echo "version=$version"
+        echo "src/version.h version (numeric): $version_numeric"
+        echo "src/version.h version (date): $version_date"
+        echo "Newest tag (numeric): $latest_tag_numeric"
+        echo "Newest tag (date): $latest_tag_date"
+
+
+        # Compare numeric parts
+        if [ "$(printf '%s\n' "$version_numeric" "$latest_tag_numeric" | sort -V | head -n1)" != "$latest_tag_numeric" ]; then
+          echo "src/version.h version ($version) is newer than the newest tag ($latest_tag)."
+          echo "::set-output name=should_tag::true"
+        elif [ "$version_numeric" == "$latest_tag_numeric" ] && [ "$version_date" \> "$latest_tag_date" ]; then
+          echo "src/version.h version ($version) is newer than the newest tag ($latest_tag)."
+          echo "::set-output name=should_tag::true"
+        else
+          echo "src/version.h version ($version) is not newer than the newest tag ($latest_tag)."
+          echo "::set-output name=should_tag::false"
+        fi
+
+    - name: Commit version to version.txt
+      if: steps.compare_versions.outputs.should_tag == 'true'
+      run: |
+        pwd
+        version="${{ steps.get_version.outputs.version }}"
+        echo "$version" > version.txt
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add version.txt
+        git commit -m "Update version to $version"
+        git push origin main
+
+    - name: Create and push new tag
+      if: steps.compare_versions.outputs.should_tag == 'true'
+      run: |
+        version="${{ steps.get_version.outputs.version }}"
+        git tag "$version"
+        git push origin "$version"
