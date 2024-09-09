@@ -45,6 +45,9 @@ jobs:
         latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
         echo "::set-output name=latest_tag::$latest_tag"
 
+    - name: Install semver
+      run: npm install -g semver
+
     - name: Compare versions
       id: compare_versions
       run: |
@@ -65,21 +68,29 @@ jobs:
         echo "Newest tag (numeric): $latest_tag_numeric"
         echo "Newest tag (date): $latest_tag_date"
 
-
-        # Compare numeric parts
-        if [ "$(printf '%s\n' "$version_numeric" "$latest_tag_numeric" | sort -V | head -n1)" != "$latest_tag_numeric" ]; then
+        # Compare numeric parts using semver
+        if semver gt "$version_numeric" "$latest_tag_numeric"; then
           echo "src/version.h version ($version) is newer than the newest tag ($latest_tag)."
-          echo "::set-output name=should_tag::true"
-        elif [ "$version_numeric" == "$latest_tag_numeric" ] && [ "$version_date" \> "$latest_tag_date" ]; then
-          echo "src/version.h version ($version) is newer than the newest tag ($latest_tag)."
-          echo "::set-output name=should_tag::true"
+          echo "SHOULD_TAG=true" >> $GITHUB_ENV
+        elif semver eq "$version_numeric" "$latest_tag_numeric"; then
+          # Compare date parts if numeric parts are equal
+          if [ "$version_date" \> "$latest_tag_date" ]; then
+            echo "src/version.h version ($version) is newer than the newest tag ($latest_tag)."
+            echo "SHOULD_TAG=true" >> $GITHUB_ENV
+          elif [ "$version_date" == "$latest_tag_date" ]; then
+            echo "src/version.h version ($version) is the same as the newest tag ($latest_tag)."
+            echo "SHOULD_TAG=false" >> $GITHUB_ENV
+          else
+            echo "src/version.h version ($version) is not newer than the newest tag ($latest_tag)."
+            echo "SHOULD_TAG=false" >> $GITHUB_ENV
+          fi
         else
           echo "src/version.h version ($version) is not newer than the newest tag ($latest_tag)."
-          echo "::set-output name=should_tag::false"
+          echo "SHOULD_TAG=false" >> $GITHUB_ENV
         fi
 
     - name: Commit version to version.txt
-      if: steps.compare_versions.outputs.should_tag == 'true'
+      if: env.SHOULD_TAG == 'true'
       run: |
         version="${{ steps.get_version.outputs.version }}"
         random_string=$(openssl rand -hex 8)
@@ -91,14 +102,14 @@ jobs:
         git push origin main
 
     - name: Create and push new tag
-      if: steps.compare_versions.outputs.should_tag == 'true'
+      if: env.SHOULD_TAG == 'true'
       run: |
         version="${{ steps.get_version.outputs.version }}"
         git tag "$version"
         git push origin "$version"
 
     - name: Trigger Build and Release Workflow
-      if: steps.compare_versions.outputs.should_tag == 'true'
+      if: env.SHOULD_TAG == 'true'
       run: |
         version="${{ steps.get_version.outputs.version }}"
         curl -X POST -H "Accept: application/vnd.github.v3+json" \
