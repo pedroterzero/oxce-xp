@@ -93,7 +93,7 @@ jobs:
         run: |
           cd oxce/build/bin
           rm libopenxcom.dll.a
-          zip -r ../../oxce-winxp.zip .
+          zip -r ../../../oxce-winxp.zip .
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
