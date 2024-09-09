@@ -58,11 +58,11 @@ jobs:
         run: |
           if [ -d oxce/build ]; then
             mv oxce/build _oxce_build
-            ls -la
             rm -rf oxce
           fi
           git clone https://github.com/MeridianOXC/OpenXcom.git oxce
           if [ -d _oxce_build ]; then
+            rm -rf oxce/build
             mv _oxce_build oxce/build
           fi
           cd oxce
