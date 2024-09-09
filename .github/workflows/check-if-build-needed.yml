@@ -1,9 +1,12 @@
 name: Check if Build Needed
 
 on:
-  schedule:
-    - cron: '0 0 * * *'  # Runs daily at midnight UTC
-  workflow_dispatch:  # Allows manual triggering
+  workflow_dispatch:
+    inputs:
+      oxce-ref:
+        description: 'OXCE ref'
+        required: true
+        default: 'oxce-plus'
 
 permissions:
   contents: write
@@ -23,7 +26,7 @@ jobs:
       run: |
         git clone --depth 100 https://github.com/MeridianOXC/OpenXcom.git
         cd OpenXcom
-        git checkout fbcc460
+        git checkout ${{ github.event.inputs.oxce-ref }}
 
     - name: Extract version from src/version.h
       id: get_version
@@ -100,4 +103,4 @@ jobs:
         curl -X POST -H "Accept: application/vnd.github.v3+json" \
         -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
         https://api.github.com/repos/${{ github.repository }}/dispatches \
-        -d '{"event_type":"build-and-release","client_payload":{"tag":"'"$version"'"}}'
+        -d '{"event_type":"build-and-release","client_payload":{"tag":"'"$version"'", "oxce-ref":"'"${{ github.event.inputs.oxce-ref }}"'"}}'

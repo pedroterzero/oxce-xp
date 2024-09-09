@@ -46,6 +46,9 @@ jobs:
         run: |
           git clone https://github.com/MeridianOXC/OpenXcom.git oxce
           cd oxce
+          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+            git checkout ${{ github.event.client_payload.oxce-ref }}
+          fi
           rm -rf deps
           mkdir build
           cd build
