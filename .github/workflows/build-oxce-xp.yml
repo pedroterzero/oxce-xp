@@ -8,8 +8,9 @@ name: Build OXCE-XP
 #     branches:
 #       - main
 on:
-  schedule:
-    - cron: '0 0 * * *'  # Runs daily at midnight UTC
+  push:
+    tags:
+      - '*'  # Runs when a new tag is created
   workflow_dispatch:  # Allows manual triggering
 
 jobs:
