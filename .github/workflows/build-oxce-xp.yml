@@ -76,9 +76,11 @@ jobs:
             mkdir build
           fi
           cd build
+          ls -al
           export PATH=/opt/mxe/usr/bin:$PATH
           /opt/mxe/usr/bin/i686-w64-mingw32.static-cmake -DCMAKE_BUILD_TYPE=Release -DDEV_BUILD=OFF -DBUILD_PACKAGE=OFF ..
           make -j$(nproc)
+          ls -al
 
       - name: Cache build directory
         if: always()
