@@ -56,7 +56,9 @@ jobs:
 
       - name: Build
         run: |
+          CACHED_BUILD=0
           if [ -d oxce/build ]; then
+            CACHED_BUILD=1
             mv oxce/build _oxce_build
             rm -rf oxce
           fi
@@ -70,7 +72,9 @@ jobs:
             git checkout ${{ github.event.client_payload.oxce-ref }}
           fi
           rm -rf deps
-          mkdir build
+          if [ $CACHED_BUILD -ne 1 ]; then
+            mkdir build
+          fi
           cd build
           export PATH=/opt/mxe/usr/bin:$PATH
           /opt/mxe/usr/bin/i686-w64-mingw32.static-cmake -DCMAKE_BUILD_TYPE=Release -DDEV_BUILD=OFF -DBUILD_PACKAGE=OFF ..
