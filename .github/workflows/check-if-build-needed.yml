@@ -93,3 +93,11 @@ jobs:
         version="${{ steps.get_version.outputs.version }}"
         git tag "$version"
         git push origin "$version"
+
+    - name: Trigger Build and Release Workflow
+      if: steps.compare_versions.outputs.should_tag == 'true'
+      run: |
+        curl -X POST -H "Accept: application/vnd.github.v3+json" \
+        -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+        https://api.github.com/repos/${{ github.repository }}/dispatches \
+        -d '{"event_type":"build-and-release","client_payload":{"tag":"'"$version"'"}}'
