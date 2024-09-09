@@ -12,6 +12,9 @@ on:
     types: [build-and-release]
   workflow_dispatch:  # Allows manual triggering
 
+permissions:
+  contents: write
+
 jobs:
   build-mxe:
     uses: ./.github/workflows/build-mxe.yml
