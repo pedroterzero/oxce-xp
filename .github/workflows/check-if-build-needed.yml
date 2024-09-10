@@ -2,7 +2,7 @@ name: Check if Build Needed
 
 on:
   schedule:
-    - cron: '12 * * * *'
+    - cron: '12 2 * * *'
   workflow_dispatch:
     inputs:
       oxce-ref:
