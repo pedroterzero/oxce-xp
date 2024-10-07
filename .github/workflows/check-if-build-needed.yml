@@ -61,6 +61,9 @@ jobs:
         version="${{ steps.get_version.outputs.version }}"
         latest_tag="${{ steps.get_tag.outputs.latest_tag }}"
 
+        echo "our version: $version"
+        echo "latest tag: $latest_tag"
+
         # Extract numeric and date parts
         IFS='-' read -r version_numeric version_date <<< "$version"
         IFS='-' read -r latest_tag_numeric latest_tag_date <<< "$latest_tag"
