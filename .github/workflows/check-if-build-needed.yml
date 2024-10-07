@@ -60,39 +60,17 @@ jobs:
       run: |
         version="${{ steps.get_version.outputs.version }}"
         latest_tag="${{ steps.get_tag.outputs.latest_tag }}"
-        echo "src/version.h version: $version"
-        echo "Newest tag: $latest_tag"
 
         # Extract numeric and date parts
-        version_numeric=$(echo "$version" | cut -d'-' -f1)
-        version_date=$(echo "$version" | cut -d'-' -f2-)
-        latest_tag_numeric=$(echo "$latest_tag" | cut -d'-' -f1)
-        latest_tag_date=$(echo "$latest_tag" | cut -d'-' -f2-)
+        IFS='-' read -r version_numeric version_date <<< "$version"
+        IFS='-' read -r latest_tag_numeric latest_tag_date <<< "$latest_tag"
 
-        echo "version=$version"
-        echo "src/version.h version (numeric): $version_numeric"
-        echo "src/version.h version (date): $version_date"
-        echo "Newest tag (numeric): $latest_tag_numeric"
-        echo "Newest tag (date): $latest_tag_date"
-
-        # Compare numeric parts using semver
+        # Compare versions
         if semver gt "$version_numeric" "$latest_tag_numeric"; then
-          echo "src/version.h version ($version) is newer than the newest tag ($latest_tag)."
           echo "SHOULD_TAG=true" >> $GITHUB_ENV
-        elif semver eq "$version_numeric" "$latest_tag_numeric"; then
-          # Compare date parts if numeric parts are equal
-          if [[ "$version_date" > "$latest_tag_date" ]]; then
-            echo "src/version.h version ($version) is newer than the newest tag ($latest_tag)."
-            echo "SHOULD_TAG=true" >> $GITHUB_ENV
-          elif [[ "$version_date" == "$latest_tag_date" ]]; then
-            echo "src/version.h version ($version) is the same as the newest tag ($latest_tag)."
-            echo "SHOULD_TAG=false" >> $GITHUB_ENV
-          else
-            echo "src/version.h version ($version) is not newer than the newest tag ($latest_tag)."
-            echo "SHOULD_TAG=false" >> $GITHUB_ENV
-          fi
+        elif semver eq "$version_numeric" "$latest_tag_numeric" && [[ "$version_date" > "$latest_tag_date" ]]; then
+          echo "SHOULD_TAG=true" >> $GITHUB_ENV
         else
-          echo "src/version.h version ($version) is not newer than the newest tag ($latest_tag)."
           echo "SHOULD_TAG=false" >> $GITHUB_ENV
         fi
 
