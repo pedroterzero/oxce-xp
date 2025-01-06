@@ -10,7 +10,12 @@ name: Build OXCE-XP
 on:
   repository_dispatch:
     types: [build-and-release]
-  workflow_dispatch:  # Allows manual triggering
+  workflow_dispatch:
+    inputs:
+      oxce-ref:
+        description: 'The reference (branch or commit) to build from the OpenXcom repository'
+        required: true
+        default: 'oxce-plus'
 
 permissions:
   contents: write
@@ -70,6 +75,8 @@ jobs:
           cd oxce
           if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
             git checkout ${{ github.event.client_payload.oxce-ref }}
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            git checkout ${{ github.event.inputs.oxce-ref }}
           fi
           rm -rf deps
           if [ $CACHED_BUILD -ne 1 ]; then
