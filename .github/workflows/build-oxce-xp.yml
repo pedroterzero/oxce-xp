@@ -24,6 +24,10 @@ on:
         description: 'The GCC version to use'
         required: true
         default: '11'
+      enable-tmate:
+        description: 'Enable tmate session for debugging'
+        required: false
+        default: 'false'
 
 permissions:
   contents: write
@@ -149,7 +153,14 @@ jobs:
           asset_name: oxce-winxp-${{ env.tag }}.zip
           asset_content_type: application/zip
 
+      - name: Setup tmate session
+        if: failure() && env.ENABLE_TMATE == 'true'
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
+          timeout-minutes: 120
+
       # - name: Setup tmate session
       #   if: always()
       #   uses: mxschmitt/action-tmate@v3
-      #   timeout-minutes: 30
+      #   timeout-minutes: 30        if: failure() && env.ENABLE_TMATE == 'true'
