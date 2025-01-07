@@ -30,13 +30,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y autopoint gperf intltool libtool-bin lzip
 
+      - name: Install MXE dependencies for newer MXE/GCC
+        if: steps.cache-mxe.outputs.cache-hit != 'true' && inputs.GCC_VERSION > '11'
+        run: |
+          sudo apt-get install -y python3-mako
+
       - name: Install further dependencies for ACT
         if: ${{ env.ACT }}
         run: |
           sudo apt-get install -y p7zip-full bison flex ruby
 
       - name: Remove Python 3 and set Python 2 as default
-        if: steps.cache-mxe.outputs.cache-hit != 'true' && env.GCC_VERSION <= '11'
+        if: steps.cache-mxe.outputs.cache-hit != 'true' && inputs.GCC_VERSION <= '11'
         run: |
           sudo apt-get remove -y python3
           sudo apt-get install -y python2
