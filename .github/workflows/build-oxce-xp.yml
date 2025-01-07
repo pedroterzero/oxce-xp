@@ -161,6 +161,15 @@ jobs:
           limit-access-to-actor: true
           timeout-minutes: 120
 
+      - name: Keep tmate session alive
+        if: failure() && env.ENABLE_TMATE == 'true'
+        run: |
+          echo "tmate session is active. It will stay alive for a maximum of 2 hours."
+          SECONDS=0
+          while [ $SECONDS -lt 7200 ]; do
+            sleep 30
+          done
+
       # - name: Setup tmate session
       #   if: always()
       #   uses: mxschmitt/action-tmate@v3
