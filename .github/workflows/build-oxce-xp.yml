@@ -19,7 +19,7 @@ on:
       mxe-version:
         description: 'The MXE version to use'
         required: true
-        default: '3b58a3e88c36e8cefb5e88441d4dae9deea3164e'
+        default: '7e39b555dee5e906b24a44940055dc28d4056d23'
       gcc-version:
         description: 'The GCC version to use'
         required: true
@@ -36,7 +36,7 @@ jobs:
   build-mxe:
     uses: ./.github/workflows/build-mxe.yml
     with:
-      MXE_VERSION: ${{ github.event.inputs.mxe-version || '3b58a3e88c36e8cefb5e88441d4dae9deea3164e' }}
+      MXE_VERSION: ${{ github.event.inputs.mxe-version || '7e39b555dee5e906b24a44940055dc28d4056d23' }}
       GCC_VERSION: ${{ github.event.inputs.gcc-version || '11' }}
 
   build-oxce:
@@ -45,7 +45,7 @@ jobs:
       - build-mxe
 
     env:
-      MXE_VERSION: ${{ github.event.inputs.mxe-version || '3b58a3e88c36e8cefb5e88441d4dae9deea3164e' }}
+      MXE_VERSION: ${{ github.event.inputs.mxe-version || '7e39b555dee5e906b24a44940055dc28d4056d23' }}
       GCC_VERSION: ${{ github.event.inputs.gcc-version || '11' }}
       ENABLE_TMATE: ${{ github.event.inputs.enable-tmate || 'false' }}
 
