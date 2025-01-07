@@ -47,6 +47,7 @@ jobs:
     env:
       MXE_VERSION: ${{ github.event.inputs.mxe-version || '3b58a3e88c36e8cefb5e88441d4dae9deea3164e' }}
       GCC_VERSION: ${{ github.event.inputs.gcc-version || '11' }}
+      ENABLE_TMATE: ${{ github.event.inputs.enable-tmate || 'false' }}
 
     steps:
       - name: Get MXE from cache (${{ env.MXE_VERSION }}, gcc ${{ env.GCC_VERSION }})
