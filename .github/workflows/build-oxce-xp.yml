@@ -16,6 +16,14 @@ on:
         description: 'The reference (branch or commit) to build from the OpenXcom repository'
         required: true
         default: 'oxce-plus'
+      mxe-version:
+        description: 'The MXE version to use'
+        required: true
+        default: '3b58a3e88c36e8cefb5e88441d4dae9deea3164e'
+      gcc-version:
+        description: 'The GCC version to use'
+        required: true
+        default: '11'
 
 permissions:
   contents: write
@@ -24,8 +32,8 @@ jobs:
   build-mxe:
     uses: ./.github/workflows/build-mxe.yml
     with:
-      MXE_VERSION: 3b58a3e88c36e8cefb5e88441d4dae9deea3164e # first gcc11
-      GCC_VERSION: 11
+      MXE_VERSION: ${{ github.event.inputs.mxe-version || '3b58a3e88c36e8cefb5e88441d4dae9deea3164e' }}
+      GCC_VERSION: ${{ github.event.inputs.gcc-version || '11' }}
 
   build-oxce:
     runs-on: ubuntu-22.04
@@ -33,8 +41,8 @@ jobs:
       - build-mxe
 
     env:
-      MXE_VERSION: 3b58a3e88c36e8cefb5e88441d4dae9deea3164e # first gcc11
-      GCC_VERSION: 11
+      MXE_VERSION: ${{ github.event.inputs.mxe-version || '3b58a3e88c36e8cefb5e88441d4dae9deea3164e' }}
+      GCC_VERSION: ${{ github.event.inputs.gcc-version || '11' }}
 
     steps:
       - name: Get MXE from cache (${{ env.MXE_VERSION }}, gcc ${{ env.GCC_VERSION }})
