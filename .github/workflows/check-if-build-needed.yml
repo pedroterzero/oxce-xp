@@ -9,6 +9,10 @@ on:
         description: 'OXCE ref'
         required: true
         default: 'oxce-plus'
+      force-build:
+        description: 'Force build even if the version is not newer'
+        required: false
+        default: 'false'
 
 permissions:
   contents: write
@@ -60,6 +64,7 @@ jobs:
       run: |
         version="${{ steps.get_version.outputs.version }}"
         latest_tag="${{ steps.get_tag.outputs.latest_tag }}"
+        force_build="${{ github.event.inputs.force-build }}"
 
         # Extract numeric and date parts
         IFS='-' read -r version_numeric version_date <<< "$version"
@@ -70,9 +75,11 @@ jobs:
         echo "latest tag numeric: $latest_tag_numeric"
         echo "latest tag date: $latest_tag_date"
 
-
         # Compare versions
-        if semver "$version_numeric" -r ">$latest_tag_numeric"; then
+        if [ "$force_build" == "true" ]; then
+          echo "Force build is enabled."
+          echo "SHOULD_TAG=true" >> $GITHUB_ENV
+        elif semver "$version_numeric" -r ">$latest_tag_numeric"; then
           echo "src/version.h version ($version) is newer than the newest tag ($latest_tag, version number)."
           echo "SHOULD_TAG=true" >> $GITHUB_ENV
         elif semver "$version_numeric" -r "=$latest_tag_numeric" && [[ "$version_date" > "$latest_tag_date" ]]; then
