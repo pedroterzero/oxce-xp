@@ -70,6 +70,10 @@ jobs:
         IFS='-' read -r version_numeric version_date <<< "$version"
         IFS='-' read -r latest_tag_numeric latest_tag_date <<< "$latest_tag"
 
+        # Normalize versions to have 3 parts (major.minor.patch)
+        version_numeric=$(echo "$version_numeric" | awk -F. '{printf "%d.%d.%d", $1, $2, $3+0}')
+        latest_tag_numeric=$(echo "$latest_tag_numeric" | awk -F. '{printf "%d.%d.%d", $1, $2, $3+0}')
+
         echo "our version numeric: $version_numeric"
         echo "our version date: $version_date"
         echo "latest tag numeric: $latest_tag_numeric"
